@@ -9,7 +9,7 @@ game.board.randomize()
 </script>
 
 <template>
-  <Board :cells="game.board.getBoard()"/>
+  <Board :cells="game.board.getAsBoolean()"/>
 </template>
 
 <style scoped>

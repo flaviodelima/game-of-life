@@ -1,4 +1,61 @@
-type Cell = boolean
+class Cell {
+  private _isAlive: boolean;
+  private _position: [number, number];
+  static board: Board;
+  neighbors: Cell[] = [];
+
+  constructor(isAlive: boolean, position: [number, number]) {
+    this._isAlive = isAlive
+    this._position = position
+  }
+
+  get position():[number, number] {
+    return this._position;
+  }
+  
+  get isAlive():boolean {
+    return this._isAlive;
+  }
+
+  beBorn():void {
+    this._isAlive = true
+  }
+
+  die():void {
+    this._isAlive = false
+  }
+
+  private findNeighbors(board:Board):Cell[] {
+    if (this.neighbors.length) return this.neighbors
+
+    const [row, col] = this.position
+    const grid = board.getCells()
+    const rows = grid.length
+    const cols = grid[0].length
+    const neighbors:Cell[] = []
+
+    for (let i = row - 1; i <= row + 1; i++) {
+      if (i < 0 || i >= rows) continue
+      for (let j = col - 1; j <= col + 1; j++) {
+        if (j < 0 || j >= cols || (i === row && j === col)) continue
+        neighbors.push(grid[i][j])
+      }
+    }
+
+    this.neighbors = neighbors;
+    return neighbors
+  }
+
+  countNeighbors(board:Board):number {
+    if (!this.neighbors) this.findNeighbors(board)
+    let count = 0
+    this.neighbors.forEach((cell) => {
+      if (cell.isAlive) count++
+    })
+
+    return count
+  }
+}
 
 export class Board {
   private grid: Cell[][]
@@ -13,20 +70,19 @@ export class Board {
     return this.grid[row][col]
   }
 
-  setCell(row:number, col:number, value:Cell):void {
-    this.grid[row][col] = value
-  }
-
   randomize(oddsRate:number = 0.2):void {
     this.grid.forEach((row, i) => {
       row.forEach((_, j) => {
-        this.setCell(i, j, Math.random() < oddsRate)
-      })
+        this.grid[i][j] = new Cell(Math.random() < oddsRate, [i, j])})
     })
   }
 
-  getBoard():Cell[][] {
+  getCells():Cell[][] {
     return this.grid
+  }
+
+  getAsBoolean():boolean[][] {
+    return this.grid.map((row) => row.map((cell) => cell.isAlive))
   }
 }
 
@@ -39,6 +95,6 @@ export class Game {
   }
 
   getBoard():Cell[][] {
-    return this.board.getBoard()
+    return this.board.getCells()
   }
 }
