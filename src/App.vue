@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import Board from './components/Board.vue'
-const cells = [
-  [false, true, false, false],
-  [false, false, true, false],
-  [true, false, false, false],
-  [true, true, true, false],
-]
+import { Game } from "./game";
+import { Board as GameBoard } from "./game";
+
+const board = new GameBoard(20, 20)
+const game = new Game(board)
+game.board.randomize()
 </script>
 
 <template>
-  <Board :cells="cells"/>
+  <Board :cells="game.board.getBoard()"/>
 </template>
 
 <style scoped>
