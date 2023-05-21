@@ -1,14 +1,35 @@
 <script setup lang="ts">
 import Cell from './Cell.vue'
+import { computed } from 'vue'
 
-defineProps<{
+const prop = defineProps<{
   cells: boolean[][];
 }>()
+
+//define computed property color
+const numberOfRows = computed(() => {
+  return prop.cells.length
+})
+
+const numberOfColumns = computed(() => {
+  return prop.cells[0].length
+})
+
 </script>
 
 <template>
-  <div id="board">
-    <div v-for="row , rowNumber in cells" :key="rowNumber" class="rows">
+  <div
+    id="board" 
+    :style="{
+      gridTemplateRows: `repeat(${numberOfRows}, 1fr)`
+    }">
+    <div 
+      v-for="row , rowNumber in cells" 
+      :key="rowNumber"
+      class="rows"
+      :style="{
+        gridTemplateColumns: `repeat(${numberOfColumns}, 1fr)`
+      }">
       <div v-for="cell, columnNumber in row" :key="columnNumber">
         <Cell
           class="cell"
@@ -25,7 +46,6 @@ defineProps<{
 #board {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(3, 1fr);
   grid-gap: 1rem;
   height: 100%;
   aspect-ratio: 1 / 1;
@@ -35,7 +55,6 @@ defineProps<{
 
 .rows {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   grid-gap: 1rem;
   /* background-color: blanchedalmond; */
 }
