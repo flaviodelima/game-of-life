@@ -1,35 +1,35 @@
 class Cell {
   private _isAlive: boolean;
-  private _position: [number, number];
-  static board: Board;
+  readonly position: [number, number];
+  neighborCount: number = 0;
+  board: Board;
   neighbors: Cell[] = [];
 
-  constructor(isAlive: boolean, position: [number, number]) {
+  constructor(isAlive: boolean, position: [number, number], board:Board) {
     this._isAlive = isAlive
-    this._position = position
-  }
-
-  get position():[number, number] {
-    return this._position;
+    this.position = position
+    this.board = board
   }
   
   get isAlive():boolean {
     return this._isAlive;
   }
 
-  beBorn():void {
+  beBorn():Cell {
     this._isAlive = true
+    return this
   }
 
-  die():void {
+  die():Cell {
     this._isAlive = false
+    return this
   }
 
-  private findNeighbors(board:Board):Cell[] {
-    if (this.neighbors.length) return this.neighbors
+  findNeighbors():Cell[] {
+    // if (this.neighbors.length) return this.neighbors
 
     const [row, col] = this.position
-    const grid = board.getCells()
+    const grid = this.board.getCells()
     const rows = grid.length
     const cols = grid[0].length
     const neighbors:Cell[] = []
@@ -46,34 +46,74 @@ class Cell {
     return neighbors
   }
 
-  countNeighbors(board:Board):number {
-    if (!this.neighbors) this.findNeighbors(board)
+  private shouldDieByUnderpopulation(count:number):boolean {
+    return count < 2
+  }
+
+  private shouldDieByOverpopulation(count:number):boolean {
+    return count > 3
+  }
+
+  private shouldBeBorn(count:number):boolean {
+    return count === 3
+  }
+
+  countNeighbors():number {
+    // if (!this.neighbors.length) this.findNeighbors()
     let count = 0
     this.neighbors.forEach((cell) => {
       if (cell.isAlive) count++
     })
-
+    this.neighborCount = count
     return count
+  }
+
+  shouldDie():boolean {
+    if(!this.isAlive) return false
+    const count = this.countNeighbors()
+    return this.shouldDieByUnderpopulation(count) ||
+      this.shouldDieByOverpopulation(count)
+  }
+
+  next():Cell {
+    const count = this.neighborCount
+
+    if( this.shouldDie()) {
+      return this.die();
+    }
+    if (this.shouldBeBorn(count)) {
+      return this.beBorn();
+    }
+    return this;
   }
 }
 
 export class Board {
   private grid: Cell[][]
-
-  constructor(rows:number = 3, cols:number = 3) {
+  constructor(rows:number = 3, cols?:number ) {
+    if (!cols) cols = rows
     this.grid = new Array(rows).fill(false).map(
         () => new Array(cols).fill(false)
     )
+    this.randomize()
+  }
+
+  countNeighborsPerCell():number[][] {
+    return this.grid.map((row) => row.map((cell) => cell.countNeighbors()))
+  }
+
+  next():void {
+    this.grid.forEach((row) => row.forEach((cell) => cell.next()))
   }
 
   getCell(row:number, col:number):Cell {
     return this.grid[row][col]
   }
 
-  randomize(oddsRate:number = 0.2):void {
+  randomize(oddsRate:number = 0.12):void {
     this.grid.forEach((row, i) => {
       row.forEach((_, j) => {
-        this.grid[i][j] = new Cell(Math.random() < oddsRate, [i, j])})
+        this.grid[i][j] = new Cell(Math.random() < oddsRate, [i, j], this)})
     })
   }
 
@@ -84,17 +124,52 @@ export class Board {
   getAsBoolean():boolean[][] {
     return this.grid.map((row) => row.map((cell) => cell.isAlive))
   }
+
+  get cells():Cell[] {
+    return this.grid.flat()
+  }
 }
 
 export class Game {
   board: Board
+  boardHistory: boolean[][][] = []
 
-  constructor(board: Board) {
-    this.board = board
+  constructor(row:number, col?:number) {
+    this.board = new Board(row, col)
     this.board.randomize()
+  }
+
+  restart():void {
+    this.board.randomize()
+    this.boardHistory = []
   }
 
   getBoard():Cell[][] {
     return this.board.getCells()
   }
+
+  computeNeighbors():void {
+    this.boardHistory.push(this.board.getAsBoolean())
+    this.board.cells.forEach(cell => {
+      cell.findNeighbors()
+      cell.countNeighbors()
+    })
+  }
+
+  next():void {
+    this.addHistory()
+    this.board.next()
+  }
+
+  addHistory():void {
+    this.boardHistory.push(this.board.getAsBoolean())
+  }
+}
+
+export function prettyPrintBoard(board: boolean[][]): void {
+  console.log(board.map(row => row.map(cell => cell ? 'X' : 'O').join(' ')).join('\n'))
+}
+
+export function prettyNeiborsCount(board: number[][]): void {
+  console.log(board.map(row => row.map(cell => cell).join(' ')).join('\n'))
 }

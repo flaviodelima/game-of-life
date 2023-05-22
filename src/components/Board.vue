@@ -46,7 +46,7 @@ const numberOfColumns = computed(() => {
 #board {
   display: grid;
   grid-template-columns: 1fr;
-  grid-gap: 1rem;
+  grid-gap: 7px;
   height: 100%;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
@@ -55,7 +55,7 @@ const numberOfColumns = computed(() => {
 
 .rows {
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: 7px;
   /* background-color: blanchedalmond; */
 }
 </style>

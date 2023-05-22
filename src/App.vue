@@ -1,15 +1,35 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
 import Board from './components/Board.vue'
 import { Game } from "./game";
-import { Board as GameBoard } from "./game";
 
-const board = new GameBoard(20, 20)
-const game = new Game(board)
+const game = new Game(40)
 game.board.randomize()
+
+const data= reactive({
+  cells: game.board.getAsBoolean()
+})
+
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'Space') {
+    game.restart()
+    data.cells = game.board.getAsBoolean()
+    game.computeNeighbors()
+  }
+})
+
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'ArrowRight') {
+    game.next()
+    data.cells = game.board.getAsBoolean()
+    game.computeNeighbors()
+  }
+})
+
 </script>
 
 <template>
-  <Board :cells="game.board.getAsBoolean()"/>
+  <Board :cells="data.cells"/>
 </template>
 
 <style scoped>
