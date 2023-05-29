@@ -98,6 +98,10 @@ export class Board {
     this.randomize()
   }
 
+  empty():void {
+    this.grid = this.grid.map((row) => row.map((cell) => cell.die()))
+  }
+
   countNeighborsPerCell():number[][] {
     return this.grid.map((row) => row.map((cell) => cell.countNeighbors()))
   }
@@ -146,6 +150,10 @@ export class Game {
 
   getBoard():Cell[][] {
     return this.board.getCells()
+  }
+
+  empty():void {
+    this.board.empty()
   }
 
   computeNeighbors():void {

@@ -10,6 +10,15 @@ const data= reactive({
   cells: game.board.getAsBoolean()
 })
 
+//empty board on e key
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyE') {
+    game.board.empty()
+    data.cells = game.board.getAsBoolean()
+    game.computeNeighbors()
+  }
+})
+
 window.addEventListener('keydown', (event) => {
   if (event.code === 'Space') {
     game.restart()
