@@ -9,12 +9,14 @@ game.board.randomize()
 provide('game', game)
 
 const data= reactive({
-  cells: game.board.getAsBoolean()
+  cells: game.board.getAsBoolean(),
+  neighborsMap: game.board.buildNeighborsMap()
 })
 
 function updateBoard() {
   data.cells = game.board.getAsBoolean()
   game.computeNeighbors()
+  data.neighborsMap = game.board.buildNeighborsMap()
 }
 
 //empty board on e key
@@ -45,6 +47,7 @@ window.addEventListener('keydown', (event) => {
   <Board
     @update:board="updateBoard"
     :cells="data.cells"
+    :neighborsMap="data.neighborsMap"
   />
 </template>
 

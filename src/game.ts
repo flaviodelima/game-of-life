@@ -64,7 +64,6 @@ class Cell {
   }
 
   countNeighbors():number {
-    // if (!this.neighbors.length) this.findNeighbors()
     let count = 0
     this.neighbors.forEach((cell) => {
       if (cell.isAlive) count++
@@ -111,8 +110,8 @@ export class Board {
     this._grid = this._grid.map((row) => row.map((cell) => cell.die()))
   }
 
-  countNeighborsPerCell():number[][] {
-    return this._grid.map((row) => row.map((cell) => cell.countNeighbors()))
+  buildNeighborsMap():number[][] {
+    return this._grid.map((row) => row.map((cell) => cell.neighborCount))
   }
 
   next():void {
@@ -187,6 +186,6 @@ export function prettyPrintBoard(board: boolean[][]): void {
   console.log(board.map(row => row.map(cell => cell ? 'X' : 'O').join(' ')).join('\n'))
 }
 
-export function prettyNeiborsCount(board: number[][]): void {
+export function prettyPrintnNighborsCount(board: number[][]): void {
   console.log(board.map(row => row.map(cell => cell).join(' ')).join('\n'))
 }

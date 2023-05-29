@@ -10,6 +10,7 @@ const emit = defineEmits(['update:board'])
 
 const prop = defineProps<{
   cells: boolean[][];
+  neighborsMap: number[][];
 }>()
 
 const numberOfRows = computed(() => {
@@ -48,6 +49,7 @@ function updateCell(e: { position: { x: number; y: number } }) {
           :class="{ alive: cell }"
           :alive="cell"
           :position="{ x:columnNumber, y:rowNumber }"
+          :neighborCount="neighborsMap[rowNumber][columnNumber]"
         />
       </div>
     </div>
