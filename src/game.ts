@@ -15,6 +15,11 @@ class Cell {
     return this._isAlive;
   }
 
+  toggle():Cell {
+    this._isAlive = !this._isAlive
+    return this
+  }
+
   beBorn():Cell {
     this._isAlive = true
     return this
@@ -89,48 +94,52 @@ class Cell {
 }
 
 export class Board {
-  private grid: Cell[][]
+  private _grid: Cell[][]
   constructor(rows:number = 3, cols?:number ) {
     if (!cols) cols = rows
-    this.grid = new Array(rows).fill(false).map(
+    this._grid = new Array(rows).fill(false).map(
         () => new Array(cols).fill(false)
     )
     this.randomize()
   }
 
+  get grid():Cell[][] {
+    return this._grid
+  }
+
   empty():void {
-    this.grid = this.grid.map((row) => row.map((cell) => cell.die()))
+    this._grid = this._grid.map((row) => row.map((cell) => cell.die()))
   }
 
   countNeighborsPerCell():number[][] {
-    return this.grid.map((row) => row.map((cell) => cell.countNeighbors()))
+    return this._grid.map((row) => row.map((cell) => cell.countNeighbors()))
   }
 
   next():void {
-    this.grid.forEach((row) => row.forEach((cell) => cell.next()))
+    this._grid.forEach((row) => row.forEach((cell) => cell.next()))
   }
 
   getCell(row:number, col:number):Cell {
-    return this.grid[row][col]
+    return this._grid[row][col]
   }
 
   randomize(oddsRate:number = 0.12):void {
-    this.grid.forEach((row, i) => {
+    this._grid.forEach((row, i) => {
       row.forEach((_, j) => {
-        this.grid[i][j] = new Cell(Math.random() < oddsRate, [i, j], this)})
+        this._grid[i][j] = new Cell(Math.random() < oddsRate, [i, j], this)})
     })
   }
 
   getCells():Cell[][] {
-    return this.grid
+    return this._grid
   }
 
   getAsBoolean():boolean[][] {
-    return this.grid.map((row) => row.map((cell) => cell.isAlive))
+    return this._grid.map((row) => row.map((cell) => cell.isAlive))
   }
 
   get cells():Cell[] {
-    return this.grid.flat()
+    return this._grid.flat()
   }
 }
 

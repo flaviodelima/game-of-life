@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import Cell from './Cell.vue'
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
+import { Game } from '../game';
+
+const game = inject('game') as Game
+const board = game.board
+
+const emit = defineEmits(['update:board'])
 
 const prop = defineProps<{
   cells: boolean[][];
 }>()
 
-//define computed property color
 const numberOfRows = computed(() => {
   return prop.cells.length
 })
@@ -14,6 +19,12 @@ const numberOfRows = computed(() => {
 const numberOfColumns = computed(() => {
   return prop.cells[0].length
 })
+
+function updateCell(e: { position: { x: number; y: number } }) {
+  const {x, y} = e.position 
+  board.grid[y][x].toggle()
+  emit('update:board');
+}
 
 </script>
 
@@ -32,6 +43,7 @@ const numberOfColumns = computed(() => {
       }">
       <div v-for="cell, columnNumber in row" :key="columnNumber">
         <Cell
+          @update:alive="updateCell"
           class="cell"
           :class="{ alive: cell }"
           :alive="cell"

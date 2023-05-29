@@ -7,6 +7,9 @@ defineProps<{
 
 <template>
   <div
+    @click="$emit('update:alive', {
+      position: position
+    })"
     id="cell"
     :class="{ alive }"
   ></div>  
